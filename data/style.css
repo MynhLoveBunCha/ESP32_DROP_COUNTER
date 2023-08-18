@@ -25,7 +25,7 @@ body {
 
 .content {
     padding: 30px;
-    max-width: 600px;
+    max-width: 1000px;
     margin: 0 auto;
 }
 
@@ -37,10 +37,44 @@ body {
     padding-bottom: 20px;
 }
 
-.button {
+.row {
+    text-align: center;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.button_1 {
     padding: 15px 50px;
     font-size: 24px;
     text-align: center;
+    display: inline-block;
+    outline: none;
+    color: #fff;
+    background-color: #e60909;
+    border: none;
+    border-radius: 5px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+.button_1:active {
+    background-color: #0f8b8d;
+    box-shadow: 2 2px #CDCDCD;
+    transform: translateY(2px);
+}
+
+.button_2 {
+    padding: 15px 50px;
+    font-size: 24px;
+    text-align: center;
+    display: inline-block;
     outline: none;
     color: #fff;
     background-color: #0f8b8d;
@@ -55,7 +89,7 @@ body {
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
-.button:active {
+.button_2:active {
     background-color: #0f8b8d;
     box-shadow: 2 2px #CDCDCD;
     transform: translateY(2px);

@@ -31,7 +31,7 @@ function onLoad(event) {
 }
 
 function initButton() {
-    ['reset', 'stop'].forEach(element => {
+    ['reset', 'stop', 'increase', 'decrease', 'start'].forEach(element => {
         document.getElementById(element).addEventListener('click', function () {
             button_send_back(element);
         });
