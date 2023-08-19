@@ -199,7 +199,7 @@ void loop()
     {
         count = 0;
     }
-    else if(count < 0)  // change this
+    else if(count < 0)  // TODO: change this
     {
         count = 19;
     }
