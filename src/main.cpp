@@ -314,8 +314,15 @@ void loop()
     {
         count = 0;
     }
+<<<<<<< HEAD
 
     // update period
+=======
+    else if(count < 0)  // TODO: change this
+    {
+        count = 19;
+    }
+>>>>>>> 77ccca76a97b234928198f9fcee0a8201242d0df
     unsigned long now = millis(); // read out the current "time" ("millis()" gives the time in ms since the Arduino started)
     if ((unsigned long)(now - previousMillis_send) > interval_send)
     { // check if "interval" ms has passed since last time the clients were updated
