@@ -42,6 +42,13 @@ String gateway;
 // LED
 const int ledPin = 18;
 
+// IR sensor
+bool ir1 = false;
+bool ir2 = false;
+bool hit1 = true;
+bool hit2 = true;
+int state = 1;
+
 // count
 volatile int count = 0;
 volatile static bool is_sen_1_trig = false;
@@ -49,10 +56,10 @@ volatile static int sen_1_val;
 volatile static int sen_2_val;
 
 // Time
-int interval_send = 5;                // send data to the client every 10ms
+int interval_send = 5;                 // send data to the client every 10ms
 unsigned long previousMillis_send = 0; // we use the "millis()" command for time reference
-int interval_tft = 1;                // send data to the tft every 10ms
-unsigned long previousMillis_tft = 0; // we use the "millis()" command for time reference
+int interval_tft = 1;                  // send data to the tft every 10ms
+unsigned long previousMillis_tft = 0;  // we use the "millis()" command for time reference
 
 const long interval = 20000; // interval to wait for Wi-Fi connection (milliseconds)
 unsigned long previousMillis = 0;
@@ -125,21 +132,28 @@ void IRAM_ATTR ISR_DEC()
 // read sensor
 void IRAM_ATTR ISR_SENSOR_1()
 {
-    sen_2_val = digitalRead(SENSOR_IN_2);
-    if (sen_2_val == 1)
+    int check1 = digitalRead(SENSOR_IN_1);
+    if (check1 == 0)
     {
-        is_sen_1_trig = true;
+        ir1 = true;
+    }
+    else
+    {
+        ir1 = false;
     }
 }
 
 void IRAM_ATTR ISR_SENSOR_2()
 {
-    sen_1_val = digitalRead(SENSOR_IN_1);
-    if (sen_1_val == 1 && is_sen_1_trig)
+    int check2 = digitalRead(SENSOR_IN_2);
+    if (check2 == 0)
     {
-        count++;
+        ir2 = true;
     }
-    is_sen_1_trig = false;
+    else
+    {
+        ir2 = false;
+    }
 }
 
 // Initialize SPIFFS
@@ -228,6 +242,29 @@ void updateTFT()
     tft.drawNumber(count, tft.width() / 2, tft.height() / 2 + 40);
 }
 
+void Counter()
+{
+    if (ir1 && (state == 1) && hit1)
+    {
+        state = 2;
+        hit1 = false;
+    }
+    else if (ir2 && (state == 2) && hit2)
+    {
+        count++;
+        state = 1;
+        hit2 = false;
+    }
+    if (digitalRead(SENSOR_IN_1))
+    {
+        hit1 = true;
+    }
+    if (digitalRead(SENSOR_IN_2))
+    {
+        hit2 = true;
+    }
+}
+
 void setup()
 {
     // Serial port for debugging purposes
@@ -245,11 +282,11 @@ void setup()
     pinMode(DECREASE_PIN, INPUT_PULLUP);
 
     // attach interrupt
-    attachInterrupt(SENSOR_IN_1, ISR_SENSOR_1, FALLING); // sensor 1 falling-edge
-    attachInterrupt(SENSOR_IN_2, ISR_SENSOR_2, RISING);  // sensor 2 rising-edge
-    attachInterrupt(RESET_PIN, ISR_RESET, CHANGE);       // reset count
-    attachInterrupt(INCREASE_PIN, ISR_INC, CHANGE);      // increase count
-    attachInterrupt(DECREASE_PIN, ISR_DEC, CHANGE);      // decrease count
+    attachInterrupt(SENSOR_IN_1, ISR_SENSOR_1, CHANGE); // sensor 1 falling-edge
+    attachInterrupt(SENSOR_IN_2, ISR_SENSOR_2, CHANGE); // sensor 2 rising-edge
+    attachInterrupt(RESET_PIN, ISR_RESET, CHANGE);      // reset count
+    attachInterrupt(INCREASE_PIN, ISR_INC, CHANGE);     // increase count
+    attachInterrupt(DECREASE_PIN, ISR_DEC, CHANGE);     // decrease count
 
     // tft screen
     tft.init();
@@ -309,12 +346,13 @@ void loop()
 {
     webSocket.loop();
 
+    Counter();
+
     // reset if count is negative
     if (count < 0)
     {
         count = 0;
     }
-
     // update period
     unsigned long now = millis(); // read out the current "time" ("millis()" gives the time in ms since the Arduino started)
     if ((unsigned long)(now - previousMillis_send) > interval_send)
